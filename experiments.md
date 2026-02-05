@@ -42,3 +42,32 @@ EDA 결과를 바탕으로, 다음과 같은 파생변수를 생성하는 것이
   - 시술 횟수 증가에 따른 임신 성공률 감소 경향 확인
 
 ---
+
+## [2026/02/05] 01_EDA기반_LGBM_test.ipynb
+
+### 사용 feature
+- 파생변수만 사용 (원본 컬럼은 그대로 유지)
+  - 시술_대분류
+  - BLASTOCYST_포함
+  - 배아_이식_여부
+  - 총시술_bin3
+  - 나이_3구간
+  - 이식배아_구간
+  - Day5_이식_여부
+  - 불임_원인_개수
+  - 불임원인_복잡도
+  - 배아_해동_실시_여부
+
+### 모델/셋팅
+- 모델: LightGBM (GBDT)
+- 검증: StratifiedKFold 5-fold, `random_state=42`
+- 주요 하이퍼파라미터
+  - `num_leaves=31`
+  - `learning_rate=0.05`
+  - `feature_fraction=0.8`
+  - `bagging_fraction=0.8`, `bagging_freq=5`
+  - `num_boost_round=1000`, early stopping 50
+
+### 결과
+- Local CV AUC: 0.739735
+- LB: 0.74157
