@@ -4,3 +4,4 @@ env/
 __pycache__/
 *.log
 tmp/
+.ipynb_checkpoints/
