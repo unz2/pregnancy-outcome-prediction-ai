@@ -71,3 +71,46 @@ EDA 결과를 바탕으로, 다음과 같은 파생변수를 생성하는 것이
 ### 결과
 - Local CV AUC: 0.739735
 - LB: 0.74157
+
+---
+
+## [2026/02/06] 03_autogluon.ipynb
+
+### 사용 feature
+- 원본 컬럼 + 기존 파생변수 포함 (AutoGluon 기본 전처리)
+
+### 모델/셋팅
+- 모델: AutoGluon Tabular (다중 모델 + WeightedEnsemble)
+- 평가 지표: `roc_auc`
+
+### 결과
+- Local CV AUC: 0.722289
+- LB: 0.742
+
+---
+
+## [2026/02/06] 05_lgbm&cat.ipynb
+
+### 사용 feature
+- 파생변수 추가
+  - 시술_대분류
+  - BLASTOCYST_포함
+  - AH_포함
+  - 배아_stage_missing_count
+  - 배아_stage_all_missing (학습에서 제외)
+  - 배아_이식_여부
+  - 총시술_bin3
+  - 나이_3구간
+  - Day5_이식_여부
+  - 불임_원인_개수
+  - 전체_missing_count
+  - 결측 flag: `PGD 시술 여부_isna`, `PGS 시술 여부_isna`, `배아 이식 경과일_isna`, `난자 채취 경과일_isna`, `배아 해동 경과일_isna`
+  - 비율 변수: `이식/생성`, `저장/생성`, `해동/저장`, `미세주입_배아/난자`, `미세주입_이식/이식`
+
+### 모델/셋팅
+- 모델: CatBoost + LightGBM 앙상블
+- 검증: StratifiedKFold 5-fold, `random_state=42` (OOF-safe)
+- 불균형 대응: class weight / `scale_pos_weight`
+
+### 결과
+- Local CV AUC: CatBoost 0.740285 / LightGBM 0.739259 / Ensemble 0.740363
