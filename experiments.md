@@ -74,6 +74,39 @@ EDA 결과를 바탕으로, 다음과 같은 파생변수를 생성하는 것이
 
 ---
 
+## [2026/02/05] 02_L&C&X_stacking.ipynb
+
+### 사용 feature
+- 파생변수 추가
+  - 시술_대분류
+  - BLASTOCYST_포함
+  - 배아_이식_미도달
+  - 배아_이식_여부
+  - 배아_진행_단계
+  - 총시술_bin3
+  - 나이_3구간
+  - 이식배아_구간
+  - Day5_이식_여부
+  - 불임_원인_개수
+  - 불임원인_복잡도
+  - 배아_해동_실시_여부
+  - 배아_생성_효율
+  - 배아_이식_비율
+  - 배아_저장_비율
+  - 나이×Day5
+  - 시술횟수×나이
+
+### 모델/셋팅
+- 모델: LightGBM + CatBoost + XGBoost 스태킹
+- 검증: StratifiedKFold 5-fold, `random_state=42`
+- 메타모델: Logistic Regression
+
+### 결과
+- Local CV AUC: LGB 0.739818 / CAT 0.739827 / XGB 0.738716 / Stacking 0.740306
+- LB: 미제출
+
+---
+
 ## [2026/02/06] 03_autogluon.ipynb
 
 ### 사용 feature
@@ -84,8 +117,24 @@ EDA 결과를 바탕으로, 다음과 같은 파생변수를 생성하는 것이
 - 평가 지표: `roc_auc`
 
 ### 결과
-- Local CV AUC: 0.722289
+- Local CV AUC: 0.7407
 - LB: 0.742
+
+---
+
+## [2026/02/06] 04_5model_test.ipynb
+
+### 사용 feature
+- 02번과 동일한 파생변수 + 교차특성(나이×Day5, 시술횟수×나이)
+
+### 모델/셋팅
+- 모델: LightGBM / CatBoost / XGBoost / RandomForest / LogisticRegression
+- 검증: StratifiedKFold 5-fold
+- 앙상블: simple, weighted, rank, weighted_rank, stacking 전체 조합 테스트
+
+### 결과
+- Local CV AUC (Best): 0.740287 (LGB+CAT+XGB, stacking)
+- LB: 미제출
 
 ---
 
@@ -114,3 +163,93 @@ EDA 결과를 바탕으로, 다음과 같은 파생변수를 생성하는 것이
 
 ### 결과
 - Local CV AUC: CatBoost 0.740285 / LightGBM 0.739259 / Ensemble 0.740363
+
+---
+
+## [2026/02/07] 06_ML&DL.ipynb
+
+### 사용 feature
+- 05_lgbm&cat 파생 + 고결측 5개 제거
+- 추가 파생: `배아_품질_점수`, `최적_이식_조건`, `고령_여부`, `IVF_과거_성공률`, `배아_선별률`, `확정_실패_케이스`
+
+### 모델/셋팅
+- 모델: CatBoost + LightGBM + TabNet 앙상블
+- 검증: StratifiedKFold 5-fold
+- 후처리: `확정_실패_케이스` 예측값 0 처리
+
+### 결과
+- Local CV AUC: CatBoost 0.740026 / LightGBM 0.739016 / TabNet 0.728803 / Ensemble 0.739417
+- LB: 미제출
+
+---
+
+## [2026/02/07] 07_autogluonV2.ipynb
+
+### 사용 feature
+- 총 101개 (원본 64 + 파생 37, 고결측 5개 제거)
+
+### 모델/셋팅
+- 모델: AutoGluon Tabular (stacking, `roc_auc`)
+
+### 결과
+- Local CV AUC: 0.738555 (Best: LightGBMLarge_BAG_L1)
+- LB: 미제출
+
+---
+
+## [2026/02/07] 08_autogluonV3.ipynb
+
+### 사용 feature
+- 검증된 20개 중심 구성, 총 83개
+
+### 모델/셋팅
+- 모델: AutoGluon Tabular (stacking, `roc_auc`)
+
+### 결과
+- Local CV AUC: 0.738185 (Best: LightGBMLarge_BAG_L1)
+- LB: 미제출
+
+---
+
+## [2026/02/09] 03.1_autogluon_top20
+
+### 사용 feature
+- 03번 Feature Importance Top 20만 사용
+
+### 모델/셋팅
+- 모델: AutoGluon Tabular
+
+### 결과
+- Local CV AUC: 0.734957 (Best: WeightedEnsemble_L2)
+- LB: 미제출
+
+---
+
+## [2026/02/09] 03.2_autogluon_hypermax
+
+### 사용 feature
+- 03번 Feature 유지
+
+### 모델/셋팅
+- 모델: AutoGluon Tabular (time/stacking 확장)
+
+### 결과
+- Local CV AUC: 0.740810 (Best: WeightedEnsemble_L2)
+- LB: 0.7319
+
+---
+
+## [2026/02/09] 03.3_autogluon_seed123
+
+### 사용 feature
+- 03번 Feature 유지 (Seed=123)
+
+### 모델/셋팅
+- 모델: AutoGluon Tabular
+
+### 결과
+- Local CV AUC: 0.73 (Best: RandomForest_BAG_L2)
+- LB: 미제출
+- RandomForest만 학습됨. overfitting 되어 CV가 저렇게 나온 것 같음
+
+
